@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { FiSun, FiMoon } from 'react-icons/fi';
 import Logo from '../../atoms/Logo';
 import HamburgerButton from '../../atoms/HamburgerButton';
 import NavLinksList from '../../molecules/NavLinksList';
@@ -19,11 +20,77 @@ const Navbar = ({
     const [isOpen, setIsOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
     const [isScrolled, setIsScrolled] = useState(false);
+    const mobileNavRef = useRef(null);
+    const hamburgerRef = useRef(null);
 
     // Handle mobile menu toggle
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
+
+    // Close mobile menu with Escape key
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                setIsOpen(false);
+                // Return focus to hamburger button
+                if (hamburgerRef.current) {
+                    hamburgerRef.current.focus();
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen]);
+
+    // Trap focus in mobile menu when open
+    useEffect(() => {
+        if (isOpen && mobileNavRef.current) {
+            const focusableElements = mobileNavRef.current.querySelectorAll(
+                'a, button, [tabindex]:not([tabindex="-1"])'
+            );
+            
+            if (focusableElements.length > 0) {
+                focusableElements[0].focus();
+            }
+
+            const handleTabKey = (e) => {
+                if (e.key === 'Tab') {
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstElement) {
+                            e.preventDefault();
+                            lastElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastElement) {
+                            e.preventDefault();
+                            firstElement.focus();
+                        }
+                    }
+                }
+            };
+
+            document.addEventListener('keydown', handleTabKey);
+            return () => document.removeEventListener('keydown', handleTabKey);
+        }
+    }, [isOpen]);
+
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
 
     // Close mobile menu when clicking outside or on link
     const handleLinkClick = (sectionId) => {
@@ -98,13 +165,15 @@ const Navbar = ({
         <NavbarStyled 
             className={`navbar ${isScrolled ? 'scrolled' : ''} ${className}`}
             $isScrolled={isScrolled}
+            role="navigation"
+            aria-label="Main navigation"
         >
             <NavbarContainer>
                 {/* Logo */}
                 <Logo onClick={onLogoClick || (() => handleLinkClick('home'))} />
 
                 {/* Desktop Navigation */}
-                <DesktopNav>
+                <DesktopNav role="menubar" aria-label="Desktop navigation">
                     <NavLinksList 
                         onLinkClick={handleLinkClick}
                         activeSection={activeSection}
@@ -116,16 +185,32 @@ const Navbar = ({
                         onClick={toggleTheme}
                         aria-label={`Switch to ${currentTheme === 'light' ? 'dark' : 'light'} theme`}
                         title={`Switch to ${currentTheme === 'light' ? 'dark' : 'light'} theme`}
+                        role="switch"
+                        aria-checked={currentTheme === 'dark'}
                     >
-                        {currentTheme === 'light' ? '🌙' : '☀️'}
+                        <span className="theme-icon" aria-hidden="true">
+                            {currentTheme === 'light' ? <FiMoon /> : <FiSun />}
+                        </span>
+                        <span className="sr-only">
+                            {currentTheme === 'light' ? 'Dark' : 'Light'} mode
+                        </span>
                     </ThemeToggle>
                 </DesktopNav>
 
                 {/* Mobile Hamburger */}
-                <HamburgerButton onClick={toggleMenu} isOpen={isOpen} />
+                <div ref={hamburgerRef}>
+                    <HamburgerButton onClick={toggleMenu} isOpen={isOpen} />
+                </div>
 
                 {/* Mobile Navigation */}
-                <MobileNav $isOpen={isOpen}>
+                <MobileNav 
+                    $isOpen={isOpen}
+                    id="mobile-menu"
+                    role="menu"
+                    aria-label="Mobile navigation"
+                    aria-hidden={!isOpen}
+                    ref={mobileNavRef}
+                >
                     <NavLinksList 
                         onLinkClick={handleLinkClick}
                         activeSection={activeSection}
@@ -135,9 +220,13 @@ const Navbar = ({
                     <ThemeToggle 
                         onClick={toggleTheme}
                         aria-label={`Switch to ${currentTheme === 'light' ? 'dark' : 'light'} theme`}
+                        role="switch"
+                        aria-checked={currentTheme === 'dark'}
                     >
-                        {currentTheme === 'light' ? '🌙' : '☀️'} 
-                        <span>Toggle Theme</span>
+                        <span className="theme-icon" aria-hidden="true">
+                            {currentTheme === 'light' ? <FiMoon /> : <FiSun />}
+                        </span>
+                        <span className="theme-text">Toggle Theme</span>
                     </ThemeToggle>
                 </MobileNav>
             </NavbarContainer>

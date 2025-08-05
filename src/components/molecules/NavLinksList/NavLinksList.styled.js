@@ -5,35 +5,45 @@ export const NavLinksListStyled = styled.ul`
     padding: 0;
     margin: 0;
     display: flex;
-    align-items: center;
-    gap: ${({ theme }) => theme.spacing.md};
-    
-    /* Default horizontal layout */
-    flex-direction: ${({ $isVertical }) => $isVertical ? 'column' : 'row'};  // ✅ השתמש ב-$isVertical
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing.sm};
+    width: 100%;
     
     li {
         display: flex;
         align-items: center;
-    }
-    
-    /* Responsive behavior */
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        flex-direction: column;
-        gap: ${({ theme }) => theme.spacing.sm};
         width: 100%;
         
-        li {
+        a {
             width: 100%;
+            text-align: center;
+            padding: ${({ theme }) => theme.spacing.md};
+        }
+    }
+    
+    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        flex-direction: ${({ $isVertical }) => $isVertical ? 'column' : 'row'};
+        align-items: center;
+        justify-content: flex-end;
+        gap: ${({ theme }) => theme.spacing.md};
+        width: auto;
+        
+        li {
+            width: auto;
             
             a {
-                width: 100%;
-                text-align: center;
-                padding: ${({ theme }) => theme.spacing.md};
+                width: auto;
+                text-align: left;
+                padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
             }
         }
     }
     
-    /* Vertical variant styling */
+    @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
+        gap: ${({ theme }) => theme.spacing.lg};
+    }
+    
     &.vertical {
         flex-direction: column;
         align-items: stretch;
@@ -43,14 +53,11 @@ export const NavLinksListStyled = styled.ul`
         }
     }
     
-    /* Horizontal variant styling */
     &.horizontal {
-        flex-direction: row;
-        justify-content: center;
-        flex-wrap: wrap;
-        
         @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+            flex-direction: row;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
     }
 `;

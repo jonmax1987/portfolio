@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const HamburgerButtonStyled = styled.button`
-    display: none;
+    display: block;
     background: none;
     border: none;
     cursor: pointer;
@@ -10,23 +10,36 @@ export const HamburgerButtonStyled = styled.button`
     transition: all 0.3s ease;
     
     svg {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
         transition: transform 0.3s ease;
     }
     
     &:hover {
         color: ${({ theme }) => theme.colors.brandPrimary};
-        transform: scale(1.1);
     }
     
-    ${({ isOpen }) => isOpen && `
+    &:focus {
+        outline: 2px solid ${({ theme }) => theme.colors.brandPrimary};
+        outline-offset: 2px;
+    }
+    
+    ${({ $isOpen }) => $isOpen && `
         svg {
             transform: rotate(90deg);
         }
     `}
     
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        display: block;
+    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        display: none;
+        
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        &:hover {
+            transform: scale(1.1);
+        }
     }
 `;

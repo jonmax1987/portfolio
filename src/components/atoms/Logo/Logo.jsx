@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const LogoStyled = styled.div`
     font-family: ${({ theme }) => theme.typography.fontFamily};
     font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+    font-size: ${({ theme }) => theme.typography.fontSize.md};
     color: ${({ theme }) => theme.colors.brandPrimary};
     cursor: pointer;
     transition: all 0.3s ease;
@@ -37,8 +37,8 @@ const LogoStyled = styled.div`
         }
     }
     
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        font-size: ${({ theme }) => theme.typography.fontSize.md};
+    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        font-size: ${({ theme }) => theme.typography.fontSize.lg};
     }
 `;
 

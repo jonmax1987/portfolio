@@ -11,7 +11,6 @@ export const NavbarStyled = styled.nav`
     z-index: 1000;
     transition: all 0.3s ease;
     
-    /* Scrolled state */
     &.scrolled {
         background: ${({ theme }) => theme.colors.backgroundSecondary};
         box-shadow: ${({ theme }) => theme.shadows.md};
@@ -30,23 +29,23 @@ export const NavbarStyled = styled.nav`
 export const NavbarContainer = styled.div`
     max-width: 1200px;
     margin: 0 auto;
-    padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
     display: flex;
     justify-content: space-between;
     align-items: center;
     
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
     }
 `;
 
 export const DesktopNav = styled.div`
-    display: flex;
-    align-items: center;
-    gap: ${({ theme }) => theme.spacing.lg};
+    display: none;
     
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        display: none;
+    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
+        display: flex;
+        align-items: center;
+        gap: ${({ theme }) => theme.spacing.lg};
     }
 `;
 
@@ -82,7 +81,10 @@ export const ThemeToggle = styled.button`
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: ${({ theme }) => theme.spacing.xs};
+    min-width: 44px;
+    min-height: 44px;
     
     &:hover {
         background: ${({ theme }) => theme.colors.backgroundSecondary};
@@ -95,11 +97,32 @@ export const ThemeToggle = styled.button`
         outline-offset: 2px;
     }
     
-    span {
+    .theme-icon {
+        font-size: ${({ theme }) => theme.typography.fontSize.lg};
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .theme-text {
         font-size: ${({ theme }) => theme.typography.fontSize.sm};
+        white-space: nowrap;
         
         @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
             display: none;
         }
+    }
+    
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
     }
 `;
