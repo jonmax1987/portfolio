@@ -7,7 +7,20 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "echo 'Type checking placeholder - add TypeScript later'",
+    "deploy": "bash ./scripts/deploy.sh",
+    "deploy:dev": "bash ./scripts/deploy.sh dev",
+    "deploy:prod": "bash ./scripts/deploy.sh prod",
+    "deploy:direct": "bash ./scripts/deploy-direct.sh",
+    "deploy:direct:dev": "bash ./scripts/deploy-direct.sh dev",
+    "deploy:direct:prod": "bash ./scripts/deploy-direct.sh prod",
+    "validate": "bash ./scripts/validate-env.sh",
+    "sls:deploy": "cd infrastructure && serverless deploy",
+    "sls:remove": "cd infrastructure && serverless remove",
+    "sls:info": "cd infrastructure && serverless info",
+    "sls:deploy:dev": "cd infrastructure && serverless deploy --stage dev",
+    "sls:deploy:prod": "cd infrastructure && serverless deploy --stage prod"
   },
   "dependencies": {
     "prop-types": "^15.8.1",

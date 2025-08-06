@@ -1,0 +1,22 @@
+# Development Environment Configuration
+# This file contains environment-specific settings for the dev stage
+
+# CloudFront configuration for development
+cloudFront:
+  comment: 'Portfolio CloudFront Distribution - Development'
+  priceClass: PriceClass_100  # Cheapest option for dev
+  
+# Monitoring configuration
+monitoring:
+  enabled: true
+  logLevel: INFO
+  
+# Deployment configuration
+deployment:
+  autoInvalidateCache: true
+  retainOnDelete: false  # Allow deletion in dev
+  
+# Resource limits for cost control
+limits:
+  maxCacheBehaviors: 5
+  maxOrigins: 2

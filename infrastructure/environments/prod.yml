@@ -1,0 +1,23 @@
+# Production Environment Configuration
+# This file contains environment-specific settings for the prod stage
+
+# CloudFront configuration for production
+cloudFront:
+  comment: 'Portfolio CloudFront Distribution - Production'
+  priceClass: PriceClass_All  # Global distribution for prod
+  
+# Monitoring configuration
+monitoring:
+  enabled: true
+  logLevel: WARN
+  enableDetailedMetrics: true
+  
+# Deployment configuration
+deployment:
+  autoInvalidateCache: true
+  retainOnDelete: true  # Protect production resources
+  
+# Resource limits
+limits:
+  maxCacheBehaviors: 25
+  maxOrigins: 10
