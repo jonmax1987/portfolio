@@ -5,6 +5,7 @@
 
 export { default } from './Header';
 export { default as Header } from './Header';
+export { default as HeaderNew } from './HeaderNew';
 
 // Export styled components for potential reuse
 export {

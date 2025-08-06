@@ -1,28 +1,41 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { NavLinkStyled } from './NavLink.styled';
 
 const NavLink = ({ 
-    sectionId, 
+    href,
     label, 
     isActive = false,
-    onClick 
+    onClick,
+    $isMobile = false
 }) => {
     const handleClick = (e) => {
         e.preventDefault();
         if (onClick) {
-            onClick(sectionId);
+            onClick(e);
         }
     };
 
     return (
         <NavLinkStyled 
-            href={`#${sectionId}`}
+            href={href}
             onClick={handleClick}
-            className={isActive ? 'active' : ''}
+            $isActive={isActive}
+            $isMobile={$isMobile}
             aria-label={`Navigate to ${label} section`}
+            aria-current={isActive ? 'page' : undefined}
         >
             {label}
         </NavLinkStyled>
     );
+};
+
+NavLink.propTypes = {
+    href: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    isActive: PropTypes.bool,
+    onClick: PropTypes.func,
+    $isMobile: PropTypes.bool
 };
 
 export default NavLink;

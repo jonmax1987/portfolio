@@ -5,59 +5,41 @@ export const NavLinksListStyled = styled.ul`
     padding: 0;
     margin: 0;
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: ${({ theme }) => theme.spacing.sm};
-    width: 100%;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing.md};
     
     li {
         display: flex;
         align-items: center;
-        width: 100%;
-        
-        a {
-            width: 100%;
-            text-align: center;
-            padding: ${({ theme }) => theme.spacing.md};
-        }
     }
     
-    @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        flex-direction: ${({ $isVertical }) => $isVertical ? 'column' : 'row'};
-        align-items: center;
-        justify-content: flex-end;
-        gap: ${({ theme }) => theme.spacing.md};
-        width: auto;
+    /* Mobile styles */
+    ${({ $isMobile, theme }) => $isMobile && `
+        flex-direction: column;
+        align-items: stretch;
+        gap: ${theme.spacing.sm};
+        width: 100%;
         
         li {
-            width: auto;
+            width: 100%;
             
             a {
-                width: auto;
-                text-align: left;
-                padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+                width: 100%;
+                text-align: center;
+                padding: ${theme.spacing.md};
+                justify-content: center;
             }
         }
-    }
+    `}
+    
+    /* Desktop styles */
+    ${({ $isMobile }) => !$isMobile && `
+        @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+            display: none; /* Hide desktop nav on mobile */
+        }
+    `}
     
     @media (min-width: ${({ theme }) => theme.breakpoints.desktop}) {
         gap: ${({ theme }) => theme.spacing.lg};
-    }
-    
-    &.vertical {
-        flex-direction: column;
-        align-items: stretch;
-        
-        li {
-            width: 100%;
-        }
-    }
-    
-    &.horizontal {
-        @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-            flex-direction: row;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
     }
 `;

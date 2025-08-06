@@ -1,37 +1,54 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import NavLink from '../../atoms/NavLink';
 import { NavLinksListStyled } from './NavLinksList.styled';
 
 const NavLinksList = ({ 
-    onLinkClick, 
+    navigationItems = [
+        { label: 'Home', href: '#home' },
+        { label: 'About', href: '#about' },
+        { label: 'Projects', href: '#projects' },
+        { label: 'Contact', href: '#contact' }
+    ],
     activeSection = '',
-    isVertical = false,
+    onNavClick,
+    $isMobile = false,
     className = ''
 }) => {
-    const navLinks = [
-        { sectionId: 'home', label: 'Home' },
-        { sectionId: 'about', label: 'About' },
-        { sectionId: 'projects', label: 'Projects' },
-        { sectionId: 'contact', label: 'Contact' }
-    ];
-
     return (
         <NavLinksListStyled 
-            className={`nav-links-list ${isVertical ? 'vertical' : 'horizontal'} ${className}`}
-            $isVertical={isVertical}
+            className={className}
+            $isMobile={$isMobile}
         >
-            {navLinks.map(({ sectionId, label }) => (
-                <li key={sectionId}>
+            {navigationItems.map((item, index) => (
+                <li key={index}>
                     <NavLink
-                        sectionId={sectionId}
-                        label={label}
-                        isActive={activeSection === sectionId}
-                        onClick={onLinkClick}
+                        href={item.href}
+                        label={item.label}
+                        isActive={activeSection === item.href.replace('#', '')}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onNavClick && onNavClick(item.href);
+                        }}
+                        $isMobile={$isMobile}
                     />
                 </li>
             ))}
         </NavLinksListStyled>
     );
+};
+
+NavLinksList.propTypes = {
+    navigationItems: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            href: PropTypes.string.isRequired
+        })
+    ),
+    activeSection: PropTypes.string,
+    onNavClick: PropTypes.func,
+    $isMobile: PropTypes.bool,
+    className: PropTypes.string
 };
 
 export default NavLinksList;

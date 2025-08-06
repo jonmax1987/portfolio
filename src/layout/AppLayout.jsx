@@ -7,7 +7,7 @@ import { lightTheme, darkTheme } from '../theme';
 import { GlobalStyles } from '../styles/GlobalStyles';
 
 // Organisms
-import Header from '../components/organisms/Header';
+import { HeaderNew } from '../components/organisms/Header';
 import BackToTopButton from '../components/atoms/BackToTopButton';
 
 // Styled Components
@@ -83,7 +83,7 @@ const AppLayout = ({
         </SkipNavigation>
 
         {/* App Header */}
-        <Header 
+        <HeaderNew 
           currentTheme={isDarkMode ? 'dark' : 'light'}
           onThemeToggle={toggleTheme}
           showThemeToggle={showThemeToggle}
