@@ -10,14 +10,12 @@ export { default as Header } from './Header';
 export {
   HeaderContainer,
   HeaderContent,
-  Logo,
   Navigation,
   NavList,
   NavItem,
   NavLink,
   ActionsContainer,
   ThemeToggleButton,
-  MobileMenuToggle,
   SocialLinks,
   SocialLink
 } from './Header.styled';

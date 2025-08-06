@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { FaBars, FaTimes, FaGithub, FaLinkedin, FaEnvelope, FaSun, FaMoon } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaEnvelope, FaSun, FaMoon } from 'react-icons/fa';
 
 // Import reusable components
 import Logo from '../../atoms/Logo';
@@ -116,163 +116,157 @@ const Header = ({
   }, []);
 
   return (
-    <HeaderContainer 
-      $isScrolled={isScrolled}
-      role="banner"
-    >
-      <HeaderContent>
-        {/* Logo */}
-        <Logo 
-          onClick={(e) => {
-            e.preventDefault();
-            handleNavClick('#home');
-          }}
-        />
-
-        {/* Desktop Navigation */}
-        <Navigation 
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          <NavList>
-            {navigationItems.map((item, index) => (
-              <NavItem key={index}>
-                <NavLink
-                  href={item.href}
-                  $isActive={activeSection === item.href.replace('#', '')}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  aria-current={
-                    activeSection === item.href.replace('#', '') ? 'page' : undefined
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </NavItem>
-            ))}
-          </NavList>
-        </Navigation>
-
-        {/* Actions Container */}
-        <ActionsContainer>
-          {/* Theme Toggle */}
-          {showThemeToggle && onThemeToggle && (
-            <ThemeToggleButton
-              onClick={onThemeToggle}
-              aria-label={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
-              title={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
-              type="button"
-            >
-              {currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
-            </ThemeToggleButton>
-          )}
-
-          {/* Social Links */}
-          <SocialLinks>
-            {socialLinks.map((social, index) => {
-              const IconComponent = social.icon;
-              return (
-                <SocialLink
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  title={social.label}
-                >
-                  <IconComponent />
-                </SocialLink>
-              );
-            })}
-          </SocialLinks>
-
-          {/* Mobile Menu Toggle */}
-          <HamburgerButton 
-            onClick={toggleMenu}
-            isOpen={isMenuOpen}
-          />
-        </ActionsContainer>
-      </HeaderContent>
-
-      {/* Mobile Navigation Menu */}
-      {isMenuOpen && (
-        <Navigation 
-          id="mobile-menu"
-          $isMobile
-          role="navigation"
-          aria-label="Mobile navigation"
-          onClick={handleOverlayClick}
-        >
-          {/* Close Button */}
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '2px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
-              width: '50px',
-              height: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '18px',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)'
+    <>
+      <HeaderContainer 
+        $isScrolled={isScrolled}
+        role="banner"
+      >
+        <HeaderContent>
+          {/* Logo */}
+          <Logo 
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('#home');
             }}
-            aria-label="Close menu"
-          >
-            <FaTimes />
-          </button>
-          
-          <NavList $isMobile>
-            {navigationItems.map((item, index) => (
-              <NavItem key={index} $isMobile>
-                <NavLink
-                  href={item.href}
-                  $isActive={activeSection === item.href.replace('#', '')}
-                  $isMobile
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  aria-current={
-                    activeSection === item.href.replace('#', '') ? 'page' : undefined
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </NavItem>
-            ))}
-          </NavList>
+          />
 
-          {/* Mobile Social Links */}
-          <SocialLinks $isMobile>
-            {socialLinks.map((social, index) => {
-              const IconComponent = social.icon;
-              return (
-                <SocialLink
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  title={social.label}
-                  $isMobile
-                >
-                  <IconComponent />
-                </SocialLink>
-              );
-            })}
-          </SocialLinks>
-        </Navigation>
+          {/* Desktop Navigation */}
+          <Navigation 
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <NavList>
+              {navigationItems.map((item, index) => (
+                <NavItem key={index}>
+                  <NavLink
+                    href={item.href}
+                    $isActive={activeSection === item.href.replace('#', '')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.href);
+                    }}
+                    aria-current={
+                      activeSection === item.href.replace('#', '') ? 'page' : undefined
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                </NavItem>
+              ))}
+            </NavList>
+          </Navigation>
+
+          {/* Actions Container */}
+          <ActionsContainer>
+            {/* Theme Toggle */}
+            {showThemeToggle && onThemeToggle && (
+              <ThemeToggleButton
+                onClick={onThemeToggle}
+                aria-label={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
+                title={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
+                type="button"
+              >
+                {currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
+              </ThemeToggleButton>
+            )}
+
+            {/* Social Links */}
+            <SocialLinks>
+              {socialLinks.map((social, index) => {
+                const IconComponent = social.icon;
+                return (
+                  <SocialLink
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    title={social.label}
+                  >
+                    <IconComponent />
+                  </SocialLink>
+                );
+              })}
+            </SocialLinks>
+
+            {/* Mobile Menu Toggle */}
+            <HamburgerButton 
+              onClick={toggleMenu}
+              isOpen={isMenuOpen}
+            />
+          </ActionsContainer>
+        </HeaderContent>
+      </HeaderContainer>
+
+      {/* Mobile Navigation Menu - Modern dropdown style */}
+      {isMenuOpen && (
+        <>
+          {/* Backdrop overlay */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(2px)',
+              zIndex: 999
+            }}
+            onClick={() => setIsMenuOpen(false)}
+            aria-hidden="true"
+          />
+          
+          <Navigation 
+            id="mobile-menu"
+            $isMobile
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
+            <NavList $isMobile>
+              {navigationItems.map((item, index) => (
+                <NavItem key={index} $isMobile>
+                  <NavLink
+                    href={item.href}
+                    $isActive={activeSection === item.href.replace('#', '')}
+                    $isMobile
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.href);
+                    }}
+                    aria-current={
+                      activeSection === item.href.replace('#', '') ? 'page' : undefined
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                </NavItem>
+              ))}
+            </NavList>
+
+            {/* Mobile Social Links */}
+            <SocialLinks $isMobile>
+              {socialLinks.map((social, index) => {
+                const IconComponent = social.icon;
+                return (
+                  <SocialLink
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    title={social.label}
+                    $isMobile
+                  >
+                    <IconComponent />
+                  </SocialLink>
+                );
+              })}
+            </SocialLinks>
+          </Navigation>
+        </>
       )}
-    </HeaderContainer>
+    </>
   );
 };
 
