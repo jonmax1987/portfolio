@@ -3,7 +3,13 @@ import styled from 'styled-components';
 export const SocialLinksContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  
+  /* Mobile First: Start with smallest gap */
+  gap: 0.25rem;
+  
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    gap: 0.5rem;
+  }
   
   ${({ $isMobile, theme }) => $isMobile && `
     flex-direction: column;
@@ -13,8 +19,4 @@ export const SocialLinksContainer = styled.div`
     border-top: 1px solid ${theme.colors.border};
     margin-top: 1rem;
   `}
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    gap: 0.25rem;
-  }
 `;

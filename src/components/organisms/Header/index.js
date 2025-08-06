@@ -5,18 +5,9 @@
 
 export { default } from './Header';
 export { default as Header } from './Header';
-export { default as HeaderNew } from './HeaderNew';
 
 // Export styled components for potential reuse
 export {
   HeaderContainer,
-  HeaderContent,
-  Navigation,
-  NavList,
-  NavItem,
-  NavLink,
-  ActionsContainer,
-  ThemeToggleButton,
-  SocialLinks,
-  SocialLink
+  HeaderContent
 } from './Header.styled';

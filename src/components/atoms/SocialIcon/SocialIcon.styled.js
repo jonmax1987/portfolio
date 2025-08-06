@@ -37,11 +37,16 @@ export const SocialIconLink = styled.a`
   }
   
   ${({ $isMobile, theme }) => $isMobile && `
-    width: 3rem;
-    height: 3rem;
+    /* Mobile First: Start with smaller size */
+    width: 2.2rem;
+    height: 2.2rem;
     background: ${theme.colors.surface};
     border: 1px solid ${theme.colors.border};
     margin-bottom: 0.5rem;
+    
+    svg {
+      font-size: 1.1rem;
+    }
     
     &:hover {
       background: ${theme.colors.primary};
@@ -49,17 +54,13 @@ export const SocialIconLink = styled.a`
       border-color: ${theme.colors.primary};
     }
     
-    svg {
-      font-size: 1.5rem;
+    @media (min-width: ${theme.breakpoints.tablet}) {
+      width: 3rem;
+      height: 3rem;
+      
+      svg {
+        font-size: 1.5rem;
+      }
     }
   `}
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    width: 2.2rem;
-    height: 2.2rem;
-    
-    svg {
-      font-size: 1.1rem;
-    }
-  }
 `;

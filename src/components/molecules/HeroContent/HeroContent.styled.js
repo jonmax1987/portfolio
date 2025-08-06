@@ -129,10 +129,9 @@ export const HeroActions = styled.div`
   > * {
     flex-shrink: 0;
     
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-      width: 100%;
-      min-width: 200px;
-    }
+    /* Mobile First: Start with full width buttons */
+    width: 100%;
+    min-width: 200px;
     
     @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
       width: auto;

@@ -101,6 +101,7 @@ export const AboutGrid = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
   align-items: center;
+  justify-items: center; /* Centers grid items */
   margin-bottom: ${({ theme }) => theme.spacing.xxxl};
   
   /* Mobile First: Single column */
@@ -109,6 +110,7 @@ export const AboutGrid = styled.div`
   @media (min-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: 2fr 1fr;
     gap: ${({ theme }) => theme.spacing.xxxl};
+    justify-items: stretch; /* Reset to stretch on desktop */
   }
 `;
 
@@ -158,55 +160,88 @@ export const AboutImage = styled.div`
   position: relative;
   animation: ${slideInRight} 0.8s ease-out 0.2s both;
   
-  /* Mobile First: Center the image */
+  /* Perfect centering for all screen sizes */
   display: flex;
   justify-content: center;
+  align-items: center;
   order: -1;
   
   @media (min-width: ${({ theme }) => theme.breakpoints.lg}) {
     order: 0;
-    justify-content: flex-end;
+    justify-content: center; /* Keep centered on desktop too */
   }
   
   img {
     width: 100%;
-    max-width: 300px;
-    height: auto;
+    max-width: 280px;
+    height: 280px; /* Fixed height for better card appearance */
+    object-fit: cover; /* Ensures image fills the area nicely */
+    object-position: center; /* Centers the image content */
     border-radius: ${({ theme }) => theme.borderRadius.xl};
-    box-shadow: ${({ theme }) => theme.shadows.lg};
-    transition: transform ${({ theme }) => theme.transitions.medium};
+    box-shadow: ${({ theme }) => theme.shadows.xl};
+    transition: all ${({ theme }) => theme.transitions.medium};
+    border: 4px solid ${({ theme }) => theme.colors.backgroundSecondary};
     
     &:hover {
-      transform: translateY(-10px) scale(1.02);
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: ${({ theme }) => theme.shadows.xxl};
+      border-color: ${({ theme }) => theme.colors.brandPrimary}40;
     }
     
     @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
-      max-width: 400px;
+      max-width: 320px;
+      height: 320px;
     }
     
     @media (min-width: ${({ theme }) => theme.breakpoints.lg}) {
-      max-width: 100%;
+      max-width: 350px;
+      height: 350px;
     }
   }
   
-  /* Decorative elements */
+  /* Enhanced decorative card background */
   &::before {
     content: '';
     position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    background: linear-gradient(
+      135deg, 
+      ${({ theme }) => theme.colors.brandPrimary}20, 
+      ${({ theme }) => theme.colors.brandSecondary}20,
+      ${({ theme }) => theme.colors.brandPrimary}10
+    );
+    border-radius: ${({ theme }) => theme.borderRadius.xxl};
+    z-index: -1;
+    opacity: 0.8;
+    transition: all ${({ theme }) => theme.transitions.medium};
+  }
+  
+  /* Enhanced glow effect on hover */
+  &:hover::before {
     top: -20px;
     left: -20px;
-    right: 20px;
-    bottom: 20px;
-    background: linear-gradient(135deg, ${({ theme }) => theme.colors.brandPrimary}30, ${({ theme }) => theme.colors.brandSecondary}30);
-    border-radius: ${({ theme }) => theme.borderRadius.xl};
-    z-index: -1;
-    opacity: 0.7;
+    right: -20px;
+    bottom: -20px;
+    opacity: 1;
+    background: linear-gradient(
+      135deg, 
+      ${({ theme }) => theme.colors.brandPrimary}30, 
+      ${({ theme }) => theme.colors.brandSecondary}30,
+      ${({ theme }) => theme.colors.brandPrimary}20
+    );
   }
   
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     
     img:hover {
+      transform: none;
+    }
+    
+    &:hover::before {
       transform: none;
     }
   }

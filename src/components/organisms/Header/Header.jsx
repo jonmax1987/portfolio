@@ -1,28 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { FaGithub, FaLinkedin, FaEnvelope, FaSun, FaMoon } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 // Import reusable components
 import Logo from '../../atoms/Logo';
-import HamburgerButton from '../../atoms/HamburgerButton';
+import NavLinksList from '../../molecules/NavLinksList';
+import HeaderActions from '../../molecules/HeaderActions';
+import MobileNavigation from '../../molecules/MobileNavigation';
+import MobileMenuOverlay from '../../atoms/MobileMenuOverlay';
 
 // Styled Components
 import {
   HeaderContainer,
-  HeaderContent,
-  Navigation,
-  NavList,
-  NavItem,
-  NavLink,
-  ActionsContainer,
-  ThemeToggleButton,
-  SocialLinks,
-  SocialLink
+  HeaderContent
 } from './Header.styled';
 
 /**
- * Professional Header Component
- * Features: Sticky navigation, mobile menu, social links, scroll effects
+ * Modern Professional Header Component
+ * Features: Responsive design, Atomic Design principles, mobile menu
  */
 const Header = ({
   navigationItems = [
@@ -67,7 +62,6 @@ const Header = ({
       }
     };
 
-    // Always listen to scroll since header is now in grid layout
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial call
     
@@ -107,12 +101,9 @@ const Header = ({
     }
   }, [isMenuOpen]);
 
-  // Close menu when clicking on overlay background
-  const handleOverlayClick = useCallback((e) => {
-    // Only close if clicking on the overlay itself, not its children
-    if (e.target === e.currentTarget) {
-      setIsMenuOpen(false);
-    }
+  // Close mobile menu
+  const closeMobileMenu = useCallback(() => {
+    setIsMenuOpen(false);
   }, []);
 
   return (
@@ -131,141 +122,38 @@ const Header = ({
           />
 
           {/* Desktop Navigation */}
-          <Navigation 
-            role="navigation"
-            aria-label="Main navigation"
-          >
-            <NavList>
-              {navigationItems.map((item, index) => (
-                <NavItem key={index}>
-                  <NavLink
-                    href={item.href}
-                    $isActive={activeSection === item.href.replace('#', '')}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(item.href);
-                    }}
-                    aria-current={
-                      activeSection === item.href.replace('#', '') ? 'page' : undefined
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                </NavItem>
-              ))}
-            </NavList>
-          </Navigation>
+          <NavLinksList
+            navigationItems={navigationItems}
+            activeSection={activeSection}
+            onNavClick={handleNavClick}
+          />
 
           {/* Actions Container */}
-          <ActionsContainer>
-            {/* Theme Toggle */}
-            {showThemeToggle && onThemeToggle && (
-              <ThemeToggleButton
-                onClick={onThemeToggle}
-                aria-label={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
-                title={`Switch to ${currentTheme === 'dark' ? 'light' : 'dark'} theme`}
-                type="button"
-              >
-                {currentTheme === 'dark' ? <FaSun /> : <FaMoon />}
-              </ThemeToggleButton>
-            )}
-
-            {/* Social Links */}
-            <SocialLinks>
-              {socialLinks.map((social, index) => {
-                const IconComponent = social.icon;
-                return (
-                  <SocialLink
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    title={social.label}
-                  >
-                    <IconComponent />
-                  </SocialLink>
-                );
-              })}
-            </SocialLinks>
-
-            {/* Mobile Menu Toggle */}
-            <HamburgerButton 
-              onClick={toggleMenu}
-              isOpen={isMenuOpen}
-            />
-          </ActionsContainer>
+          <HeaderActions
+            currentTheme={currentTheme}
+            onThemeToggle={onThemeToggle}
+            showThemeToggle={showThemeToggle}
+            socialLinks={socialLinks}
+            isMenuOpen={isMenuOpen}
+            onMenuToggle={toggleMenu}
+          />
         </HeaderContent>
       </HeaderContainer>
 
-      {/* Mobile Navigation Menu - Modern dropdown style */}
-      {isMenuOpen && (
-        <>
-          {/* Backdrop overlay */}
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.1)',
-              backdropFilter: 'blur(2px)',
-              zIndex: 999
-            }}
-            onClick={() => setIsMenuOpen(false)}
-            aria-hidden="true"
-          />
-          
-          <Navigation 
-            id="mobile-menu"
-            $isMobile
-            role="navigation"
-            aria-label="Mobile navigation"
-          >
-            <NavList $isMobile>
-              {navigationItems.map((item, index) => (
-                <NavItem key={index} $isMobile>
-                  <NavLink
-                    href={item.href}
-                    $isActive={activeSection === item.href.replace('#', '')}
-                    $isMobile
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavClick(item.href);
-                    }}
-                    aria-current={
-                      activeSection === item.href.replace('#', '') ? 'page' : undefined
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                </NavItem>
-              ))}
-            </NavList>
+      {/* Mobile Menu Overlay */}
+      <MobileMenuOverlay
+        isOpen={isMenuOpen}
+        onClose={closeMobileMenu}
+      />
 
-            {/* Mobile Social Links */}
-            <SocialLinks $isMobile>
-              {socialLinks.map((social, index) => {
-                const IconComponent = social.icon;
-                return (
-                  <SocialLink
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    title={social.label}
-                    $isMobile
-                  >
-                    <IconComponent />
-                  </SocialLink>
-                );
-              })}
-            </SocialLinks>
-          </Navigation>
-        </>
-      )}
+      {/* Mobile Navigation Menu */}
+      <MobileNavigation
+        navigationItems={navigationItems}
+        socialLinks={socialLinks}
+        activeSection={activeSection}
+        onNavClick={handleNavClick}
+        isOpen={isMenuOpen}
+      />
     </>
   );
 };

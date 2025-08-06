@@ -2,13 +2,24 @@ import styled from 'styled-components';
 
 export const BackToTopButtonStyled = styled.button`
   position: fixed;
-  bottom: ${({ theme }) => theme.spacing.xl};
-  right: ${({ theme }) => theme.spacing.xl};
   z-index: ${({ theme }) => theme.zIndex.floating || 999};
   
+  /* Mobile First: Start with smaller size and position */
+  bottom: ${({ theme }) => theme.spacing.lg};
+  right: ${({ theme }) => theme.spacing.lg};
+  width: 45px;
+  height: 45px;
+  font-size: ${({ theme }) => theme.typography.fontSize.md};
+  
+  @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    bottom: ${({ theme }) => theme.spacing.xl};
+    right: ${({ theme }) => theme.spacing.xl};
+    width: 50px;
+    height: 50px;
+    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  }
+  
   /* Button Design */
-  width: 50px;
-  height: 50px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -25,7 +36,6 @@ export const BackToTopButtonStyled = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ theme }) => theme.typography.fontSize.lg};
   
   /* Animations */
   transition: all ${({ theme }) => theme.transitions.medium};
@@ -46,15 +56,6 @@ export const BackToTopButtonStyled = styled.button`
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.brandPrimary};
     outline-offset: 4px;
-  }
-  
-  /* Mobile Responsive */
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    bottom: ${({ theme }) => theme.spacing.lg};
-    right: ${({ theme }) => theme.spacing.lg};
-    width: 45px;
-    height: 45px;
-    font-size: ${({ theme }) => theme.typography.fontSize.md};
   }
   
   /* Reduced Motion Support */

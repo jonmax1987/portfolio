@@ -7,7 +7,7 @@ import { lightTheme, darkTheme } from '../theme';
 import { GlobalStyles } from '../styles/GlobalStyles';
 
 // Organisms
-import { HeaderNew } from '../components/organisms/Header';
+import Header from '../components/organisms/Header';
 import BackToTopButton from '../components/atoms/BackToTopButton';
 
 // Styled Components
@@ -59,14 +59,6 @@ const AppLayout = ({
     });
   }, []);
 
-  // Keyboard handler for theme toggle
-  const handleThemeToggleKeyDown = useCallback((event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleTheme();
-    }
-  }, [toggleTheme]);
-
   // Select current theme
   const currentTheme = isDarkMode ? darkTheme : lightTheme;
 
@@ -83,7 +75,7 @@ const AppLayout = ({
         </SkipNavigation>
 
         {/* App Header */}
-        <HeaderNew 
+        <Header 
           currentTheme={isDarkMode ? 'dark' : 'light'}
           onThemeToggle={toggleTheme}
           showThemeToggle={showThemeToggle}
