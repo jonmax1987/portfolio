@@ -1,0 +1,134 @@
+service: jonmax1987-portfolio
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  
+custom:
+  # Bucket name will be unique with stage suffix
+  bucketName: ${self:service}-${self:provider.stage}-${sls:instanceId}
+  
+  # CloudFront configuration
+  cloudFront:
+    comment: 'Portfolio CloudFront Distribution - ${self:provider.stage}'
+    aliases: [] # Add your custom domain here if you have one
+    certificateArn: '' # Add your SSL certificate ARN if using custom domain
+    
+  # Finch plugin for easier deployment
+  client:
+    bucketName: ${self:custom.bucketName}
+    distributionFolder: dist
+    indexDocument: index.html
+    errorDocument: index.html
+
+plugins:
+  - serverless-finch
+
+resources:
+  Resources:
+    # S3 Bucket for hosting
+    WebsiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET]
+              AllowedOrigins: ['*']
+              Id: CORSRuleId1
+              MaxAge: 3600
+
+    # S3 Bucket Policy
+    WebsiteBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref WebsiteBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref WebsiteBucket
+                  - '/*'
+
+    # CloudFront Distribution
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Comment: ${self:custom.cloudFront.comment}
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+            OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # Managed-CORS-S3Origin
+            Compress: true
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+              ErrorCachingMinTTL: 300
+            - ErrorCode: 403
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+              ErrorCachingMinTTL: 300
+          DefaultRootObject: index.html
+          Enabled: true
+          HttpVersion: http2
+          Origins:
+            - DomainName: ${self:custom.bucketName}.s3-website.eu-central-1.amazonaws.com
+              Id: S3Origin
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: http-only
+          PriceClass: PriceClass_100
+          IPV6Enabled: true
+
+  Outputs:
+    WebsiteURL:
+      Description: URL for website hosted on S3
+      Value: !GetAtt WebsiteBucket.WebsiteURL
+      Export:
+        Name: ${self:service}-${self:provider.stage}-WebsiteURL
+        
+    CloudFrontDistributionId:
+      Description: CloudFront Distribution ID
+      Value: !Ref CloudFrontDistribution
+      Export:
+        Name: ${self:service}-${self:provider.stage}-CloudFrontDistributionId
+        
+    CloudFrontDomainName:
+      Description: CloudFront Distribution Domain Name
+      Value: !GetAtt CloudFrontDistribution.DomainName
+      Export:
+        Name: ${self:service}-${self:provider.stage}-CloudFrontDomainName
+        
+    S3BucketName:
+      Description: S3 Bucket Name
+      Value: !Ref WebsiteBucket
+      Export:
+        Name: ${self:service}-${self:provider.stage}-S3BucketName
