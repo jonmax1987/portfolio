@@ -12,7 +12,7 @@ const fadeInUp = keyframes`
   }
 `;
 
-const typeWriter = keyframes`
+const _typeWriter = keyframes`
   from {
     width: 0;
   }
@@ -21,7 +21,7 @@ const typeWriter = keyframes`
   }
 `;
 
-const blink = keyframes`
+const _blink = keyframes`
   from, to {
     border-color: transparent;
   }

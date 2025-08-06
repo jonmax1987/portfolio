@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const LogoStyled = styled.div`
@@ -50,6 +51,10 @@ const Logo = ({ onClick }) => {
             <span className="slash">/&gt;</span>
         </LogoStyled>
     );
+};
+
+Logo.propTypes = {
+    onClick: PropTypes.func,
 };
 
 export default Logo;

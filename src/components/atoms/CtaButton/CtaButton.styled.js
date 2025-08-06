@@ -21,7 +21,7 @@ const spin = keyframes`
   }
 `;
 
-const ripple = keyframes`
+const _ripple = keyframes`
   to {
     transform: scale(4);
     opacity: 0;

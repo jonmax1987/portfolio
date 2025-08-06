@@ -198,7 +198,7 @@ export const HeroOverlay = styled.div`
   z-index: 2;
   
   /* Show overlay only when background exists */
-  ${({ $hasBackground, theme }) => $hasBackground && css`
+  ${({ $hasBackground }) => $hasBackground && css`
     background: linear-gradient(
       135deg,
       rgba(0, 0, 0, 0.4) 0%,

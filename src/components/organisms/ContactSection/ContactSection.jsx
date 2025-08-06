@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub } from 'react-icons/fa';
 import {
     ContactSectionStyled,
@@ -196,6 +197,17 @@ const ContactSection = ({
             </Container>
         </ContactSectionStyled>
     );
+};
+
+ContactSection.propTypes = {
+    id: PropTypes.string,
+    title: PropTypes.string,
+    subtitle: PropTypes.string,
+    email: PropTypes.string,
+    phone: PropTypes.string,
+    location: PropTypes.string,
+    socialLinks: PropTypes.object,
+    className: PropTypes.string,
 };
 
 export default ContactSection;

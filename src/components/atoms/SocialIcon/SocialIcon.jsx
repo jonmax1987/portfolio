@@ -7,7 +7,7 @@ import { SocialIconLink } from './SocialIcon.styled';
  * Renders a social media icon with proper accessibility
  */
 const SocialIcon = ({
-  icon: IconComponent,
+  icon: Icon,
   href,
   label,
   $isMobile = false,
@@ -23,7 +23,7 @@ const SocialIcon = ({
       $isMobile={$isMobile}
       className={className}
     >
-      <IconComponent />
+      <Icon aria-hidden="true" />
     </SocialIconLink>
   );
 };

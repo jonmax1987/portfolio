@@ -5,7 +5,7 @@ import styled, { keyframes } from 'styled-components';
  * Features: Interactive filtering, hover effects, responsive masonry layout
  */
 
-const fadeInUp = keyframes`
+const _fadeInUp = keyframes`
   from {
     opacity: 0;
     transform: translateY(30px);

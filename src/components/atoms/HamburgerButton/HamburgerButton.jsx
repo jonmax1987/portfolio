@@ -1,4 +1,5 @@
 import { HiMenuAlt3 } from 'react-icons/hi';
+import PropTypes from 'prop-types';
 import { HamburgerButtonStyled } from './HamburgerButton.styled';
 
 const HamburgerButton = ({ onClick, isOpen }) => {
@@ -21,6 +22,11 @@ const HamburgerButton = ({ onClick, isOpen }) => {
             <HiMenuAlt3 aria-hidden="true" />
         </HamburgerButtonStyled>
     );
+};
+
+HamburgerButton.propTypes = {
+    onClick: PropTypes.func.isRequired,
+    isOpen: PropTypes.bool.isRequired,
 };
 
 export default HamburgerButton;
