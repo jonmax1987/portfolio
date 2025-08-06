@@ -131,6 +131,7 @@ const HeroSection = React.memo(({
 
   return (
     <HeroSectionStyled
+      id="home"
       ref={sectionRef}
       className={className}
       $fullHeight={fullHeight}
