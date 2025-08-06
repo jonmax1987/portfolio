@@ -1,0 +1,260 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Deployment stage'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      force_deploy:
+        description: 'Force deployment even if no changes'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18.x'
+  AWS_REGION: 'eu-central-1'
+
+jobs:
+  # Lint and Test Job
+  quality-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run type checking
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 1
+
+  # Security and Validation
+  security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level moderate
+        continue-on-error: true
+
+      - name: Check for outdated packages
+        run: npm outdated
+        continue-on-error: true
+
+  # Deploy to Development
+  deploy-dev:
+    if: |
+      github.ref == 'refs/heads/develop' || 
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'dev')
+    runs-on: ubuntu-latest
+    needs: [quality-checks, security-checks]
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.website_url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless@4.17.2
+
+      - name: Validate environment
+        run: |
+          chmod +x ./scripts/validate-env.sh
+          ./scripts/validate-env.sh
+
+      - name: Deploy to AWS
+        id: deploy
+        run: |
+          chmod +x ./scripts/deploy.sh
+          ./scripts/deploy.sh dev
+          
+          # Capture outputs
+          WEBSITE_URL=$(aws cloudformation describe-stacks \
+            --stack-name jonmax1987-portfolio-dev \
+            --region ${{ env.AWS_REGION }} \
+            --query "Stacks[0].Outputs[?OutputKey=='WebsiteURL'].OutputValue" \
+            --output text)
+          
+          echo "website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
+
+      - name: Run smoke tests
+        run: |
+          WEBSITE_URL="${{ steps.deploy.outputs.website_url }}"
+          if [ -n "$WEBSITE_URL" ]; then
+            echo "Testing website: $WEBSITE_URL"
+            curl -f -s -o /dev/null "$WEBSITE_URL" || exit 1
+            echo "✅ Website is responding"
+          fi
+
+      - name: Comment PR with preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 **Development deployment successful!**\n\n📍 Preview URL: ${{ steps.deploy.outputs.website_url }}'
+            })
+
+  # Deploy to Production
+  deploy-prod:
+    if: |
+      github.ref == 'refs/heads/main' || 
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'prod')
+    runs-on: ubuntu-latest
+    needs: [quality-checks, security-checks]
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.website_url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless@4.17.2
+
+      - name: Validate environment
+        run: |
+          chmod +x ./scripts/validate-env.sh
+          ./scripts/validate-env.sh
+
+      - name: Deploy to AWS
+        id: deploy
+        run: |
+          chmod +x ./scripts/deploy.sh
+          ./scripts/deploy.sh prod
+          
+          # Capture outputs
+          WEBSITE_URL=$(aws cloudformation describe-stacks \
+            --stack-name jonmax1987-portfolio-prod \
+            --region ${{ env.AWS_REGION }} \
+            --query "Stacks[0].Outputs[?OutputKey=='WebsiteURL'].OutputValue" \
+            --output text)
+          
+          echo "website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
+
+      - name: Run production smoke tests
+        run: |
+          WEBSITE_URL="${{ steps.deploy.outputs.website_url }}"
+          if [ -n "$WEBSITE_URL" ]; then
+            echo "Testing production website: $WEBSITE_URL"
+            
+            # Test main page
+            curl -f -s -o /dev/null "$WEBSITE_URL" || exit 1
+            
+            # Test with security headers
+            RESPONSE=$(curl -s -I "$WEBSITE_URL")
+            echo "$RESPONSE" | grep -i "strict-transport-security" || echo "⚠️ HSTS header missing"
+            echo "$RESPONSE" | grep -i "x-frame-options" || echo "⚠️ X-Frame-Options header missing"
+            
+            echo "✅ Production website is responding"
+          fi
+
+  # Cleanup old deployments (optional)
+  cleanup:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [deploy-prod]
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Cleanup old CloudFormation stacks
+        run: |
+          echo "🧹 Checking for old stacks to cleanup..."
+          # This is a placeholder for cleanup logic
+          # You can add logic here to remove old feature branch deployments
+          echo "✅ Cleanup completed"

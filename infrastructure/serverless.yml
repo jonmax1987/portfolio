@@ -1,0 +1,66 @@
+# Main Serverless Configuration
+# This is the orchestration file that combines all infrastructure stacks
+
+service: jonmax1987-portfolio
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  
+  # Global resource tags
+  tags:
+    Project: ${self:service}
+    Environment: ${self:provider.stage}
+    ManagedBy: Serverless
+    Owner: jonmax1987
+    
+  # Environment variables for functions (if we add any later)
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+
+# Custom variables
+custom:
+  # Load environment-specific configurations
+  env: ${file(infrastructure/environments/${self:provider.stage}.yml)}
+  
+  # Bucket name will be unique with stage suffix
+  bucketName: ${self:service}-${self:provider.stage}-${sls:instanceId}
+  
+  # CloudFront configuration from environment
+  cloudFront: ${self:custom.env.cloudFront}
+  
+  # Serverless-finch plugin configuration
+  client:
+    bucketName: ${self:custom.bucketName}
+    distributionFolder: dist
+    indexDocument: index.html
+    errorDocument: index.html
+
+plugins:
+  - serverless-finch
+
+# Import infrastructure stacks
+resources:
+  # Storage stack (S3 bucket)
+  - ${file(infrastructure/stacks/storage.yml)}
+  
+  # CDN stack (CloudFront with OAC)
+  - ${file(infrastructure/stacks/cdn.yml)}
+
+# Stack outputs
+outputs:
+  WebsiteURL:
+    Description: CloudFront HTTPS URL for the website
+    Value: !ImportValue ${self:service}-${self:provider.stage}-CloudFrontURL
+    
+  S3BucketName:
+    Description: S3 Bucket Name
+    Value: !ImportValue ${self:service}-${self:provider.stage}-S3BucketName
+    
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID  
+    Value: !ImportValue ${self:service}-${self:provider.stage}-CloudFrontDistributionId

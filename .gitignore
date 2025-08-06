@@ -22,3 +22,37 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Serverless Framework artifacts (legacy)
+.serverless/
+
+# AWS temporary files
+temp-bucket-policy.json
+s3-bucket-policy.json
+.env.deployment
+
+# CloudFormation templates (auto-generated)
+/tmp/storage-cf.yml
+/tmp/cdn-cf.yml
+/tmp/stack-outputs-*
+
+# Old deployment scripts (legacy)
+serverless.yml.old
+deploy.sh.old
+setup-aws.sh.old
+
+# Security - Environment variables and credentials
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.*
+.aws/credentials
+.aws/config
+**/aws-credentials.json
+**/secrets.json
+
+# Build artifacts with potential sensitive data
+build-output.json
+deployment-output.json

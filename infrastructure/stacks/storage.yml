@@ -1,0 +1,52 @@
+# S3 Storage Stack for Static Website Hosting
+# This stack creates the S3 bucket with proper configuration for website hosting
+
+Resources:
+  # S3 Bucket for hosting static website
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.bucketName}
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      # Remove public access for security - will use OAC instead
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET, HEAD]
+            AllowedOrigins: ['*']
+            Id: CORSRuleId1
+            MaxAge: 3600
+      # Resource tagging for better management
+      Tags:
+        - Key: Project
+          Value: ${self:service}
+        - Key: Environment
+          Value: ${self:provider.stage}
+        - Key: ManagedBy
+          Value: Serverless
+
+Outputs:
+  WebsiteBucketName:
+    Description: S3 Bucket Name for static website
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: ${self:service}-${self:provider.stage}-S3BucketName
+      
+  WebsiteBucketArn:
+    Description: S3 Bucket ARN
+    Value: !GetAtt WebsiteBucket.Arn
+    Export:
+      Name: ${self:service}-${self:provider.stage}-S3BucketArn
+      
+  WebsiteBucketDomainName:
+    Description: S3 Bucket Domain Name
+    Value: !GetAtt WebsiteBucket.DomainName
+    Export:
+      Name: ${self:service}-${self:provider.stage}-S3BucketDomainName

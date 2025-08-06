@@ -1,0 +1,126 @@
+# CloudFront CDN Stack with Origin Access Control (OAC) Security
+# This stack creates a secure CloudFront distribution with proper OAC setup
+
+Resources:
+  # Origin Access Control for secure S3 access
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: ${self:service}-${self:provider.stage}-OAC
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        Description: OAC for ${self:service} ${self:provider.stage} environment
+
+  # CloudFront Function for Security Headers
+  SecurityHeadersFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: ${self:service}-${self:provider.stage}-security-headers
+      FunctionConfig:
+        Comment: Add security headers to all responses
+        Runtime: cloudfront-js-1.0
+      FunctionCode: |
+        function handler(event) {
+          var response = event.response;
+          var headers = response.headers;
+          
+          // Security headers
+          headers['strict-transport-security'] = { value: 'max-age=31536000; includeSubDomains' };
+          headers['content-type-options'] = { value: 'nosniff' };
+          headers['frame-options'] = { value: 'DENY' };
+          headers['referrer-policy'] = { value: 'strict-origin-when-cross-origin' };
+          headers['permissions-policy'] = { value: 'camera=(), microphone=(), geolocation=()' };
+          
+          return response;
+        }
+
+  # CloudFront Distribution with OAC
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: ${self:custom.cloudFront.comment}
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+          # Add security headers function
+          FunctionAssociations:
+            - EventType: viewer-response
+              FunctionARN: !GetAtt SecurityHeadersFunction.FunctionMetadata.FunctionARN
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: S3Origin
+            DomainName: !ImportValue ${self:service}-${self:provider.stage}-S3BucketDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !Ref OriginAccessControl
+        # Resource tagging
+        Tags:
+          - Key: Project
+            Value: ${self:service}
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: ManagedBy
+            Value: Serverless
+
+  # S3 Bucket Policy for OAC
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !ImportValue ${self:service}-${self:provider.stage}-S3BucketName
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub 
+              - "${BucketArn}/*"
+              - BucketArn: !ImportValue ${self:service}-${self:provider.stage}-S3BucketArn
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: ${self:service}-${self:provider.stage}-CloudFrontDistributionId
+      
+  CloudFrontDomainName:
+    Description: CloudFront Distribution Domain Name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: ${self:service}-${self:provider.stage}-CloudFrontDomainName
+      
+  CloudFrontURL:
+    Description: CloudFront HTTPS URL
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+    Export:
+      Name: ${self:service}-${self:provider.stage}-CloudFrontURL
