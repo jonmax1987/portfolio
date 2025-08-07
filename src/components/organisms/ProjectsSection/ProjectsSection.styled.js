@@ -227,18 +227,19 @@ export const ProjectImage = styled.div`
   position: relative;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  
+
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: 'contain'};
     transition: transform ${({ theme }) => theme.transitions.medium};
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
   }
-  
+
   &:hover img {
     transform: scale(1.1);
   }
-  
+
   @media (prefers-reduced-motion: reduce) {
     &:hover img {
       transform: none;
